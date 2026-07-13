@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exposición del Proyecto: Clasificación de Madera (YOLO & TFLite)</title>
+    <!-- Google Fonts para una tipografía ultra-premium -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #FAF6F0;
+            --card-bg: #FFFFFF;
+            --text-main: #2D221C;
+            --text-muted: #7D6B60;
+            --accent-wood: #8B5A2B;
+            --accent-wood-light: #F5ECE1;
+            --accent-tech: #008080;
+            --accent-tech-light: #E0F2F1;
+            --border-color: #EEDECF;
+            --code-bg: #282C34;
+            --code-text: #ABB2BF;
+            --shadow: 0 10px 30px rgba(139, 90, 43, 0.08);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 40px 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* HEADER PREMIUM */
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            position: relative;
+            padding: 40px;
+            background: linear-gradient(135deg, var(--accent-wood-light) 0%, #FFFFFF 100%);
+            border-radius: 24px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+        }
+
+        header h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+            margin-bottom: 12px;
+        }
+
+        header h1 span {
+            color: var(--accent-wood);
+            position: relative;
+        }
+
+        header h1 span::after {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background-color: var(--accent-tech-light);
+            z-index: -1;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            font-weight: 400;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .tag-container {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .tag {
+            padding: 6px 16px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 50px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tag-wood {
+            background-color: var(--accent-wood-light);
+            color: var(--accent-wood);
+        }
+
+        .tag-tech {
+            background-color: var(--accent-tech-light);
+            color: var(--accent-tech);
+        }
+
+        /* DISEÑO DE PESTAÑAS INTERACTIVAS */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background-color: var(--card-bg);
+            border: 1.5px solid var(--border-color);
+            padding: 14px 28px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-radius: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+        }
+
+        .tab-btn:hover {
+            color: var(--accent-wood);
+            border-color: var(--accent-wood);
+            transform: translateY(-2px);
+        }
+
+        .tab-btn.active {
+            background-color: var(--accent-wood);
+            color: #FFFFFF;
+            border-color: var(--accent-wood);
+            box-shadow: 0 8px 20px rgba(139, 90, 43, 0.2);
+        }
+
+        /* CONTENIDO DE LAS SECCIONES */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            padding: 40px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        .card h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 24px;
+            color: var(--accent-wood);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .card h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-top: 24px;
+            margin-bottom: 12px;
+            color: var(--text-main);
+        }
+
+        .card p {
+            margin-bottom: 16px;
+            font-size: 1.1rem;
+            color: var(--text-muted);
+        }
+
+        /* LISTAS Y PASOS */
+        .steps-timeline {
+            position: relative;
+            margin: 40px 0;
+            padding-left: 30px;
+            border-left: 2px solid var(--border-color);
+        }
+
+        .step-item {
+            position: relative;
+            margin-bottom: 40px;
+        }
+
+        .step-item::before {
+            content: '';
+            position: absolute;
+            left: -41px;
+            top: 4px;
+            width: 20px;
+            height: 20px;
+            background-color: var(--bg-color);
+            border: 4px solid var(--accent-wood);
+            border-radius: 50%;
+            z-index: 2;
+        }
+
+        .step-number {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: var(--accent-tech);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .step-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--text-main);
+        }
+
+        /* BLOQUES DE CÓDIGO */
+        .code-block {
+            background-color: var(--code-bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 16px 0;
+            overflow-x: auto;
+            position: relative;
+            border: 1px solid rgba(0,0,0,0.15);
+        }
+
+        .code-block pre {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            color: var(--code-text);
+        }
+
+        .code-badge {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 600;
+            color: rgba(255,255,255,0.4);
+            letter-spacing: 1px;
+        }
+
+        .highlight-text {
+            background-color: var(--accent-wood-light);
+            color: var(--accent-wood);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95em;
+        }
+
+        .tech-badge {
+            background-color: var(--accent-tech-light);
+            color: var(--accent-tech);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95em;
+        }
+
+        /* GRID PARA COMPARACIONES Y ARQUITECTURA */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 24px 0;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* DISEÑO DE DIAGRAMAS SVG */
+        .diagram-container {
+            background-color: var(--bg-color);
+            border: 1.5px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 24px 0;
+        }
+
+        .diagram-svg {
+            width: 100%;
+            max-width: 700px;
+            height: auto;
+        }
+
+        /* ALERTA Y NOTAS EXPLICATIVAS */
+        .note-box {
+            background-color: #EAF5EA;
+            border-left: 5px solid #2E7D32;
+            padding: 20px;
+            border-radius: 0 12px 12px 0;
+            margin: 24px 0;
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        .note-box-title {
+            font-weight: 700;
+            color: #2E7D32;
+            margin-bottom: 4px;
+            font-size: 1.1rem;
+        }
+
+        .note-icon {
+            font-size: 1.6rem;
+            line-height: 1;
+        }
+
+        /* FOOTER */
+        footer {
+            text-align: center;
+            margin-top: 60px;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            border-top: 1px solid var(--border-color);
+            padding-top: 30px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <!-- ENCABEZADO -->
+    <header>
+        <div class="tag-container">
+            <span class="tag tag-wood">Natural Wood</span>
+            <span class="tag tag-tech">Mobile AI</span>
+        </div>
+        <h1>Clasificación Inteligente de Madera: <span>YOLO & Android</span></h1>
+        <p>Una guía metodológica y técnica detallada sobre la conversión del modelo de Deep Learning y su arquitectura de inferencia nativa en dispositivos móviles.</p>
+    </header>
+
+    <!-- PESTAÑAS DE NAVEGACIÓN -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab(event, 'pasos')">🛠️ 1. Paso a Paso & Comandos</button>
+        <button class="tab-btn" onclick="switchTab(event, 'arquitectura')">📱 2. Arquitectura de la App</button>
+        <button class="tab-btn" onclick="switchTab(event, 'modelo')">🧠 3. Inferencia del Modelo</button>
+    </div>
+
+    <!-- SECCIÓN 1: PASO A PASO Y COMANDOS -->
+    <div id="pasos" class="tab-content active">
+        <div class="card">
+            <h2>Metodología de Conversión y Preparación</h2>
+            <p>Para transferir un modelo entrenado en servidores o GPUs a un celular de baja potencia sin sacrificar precisión, se debe realizar un proceso de optimización, compilación y serialización. Estos son los pasos exactos y los comandos aplicados:</p>
+
+            <div class="steps-timeline">
+                
+                <!-- PASO 1 -->
+                <div class="step-item">
+                    <div class="step-number">Paso 1</div>
+                    <h3 class="step-title">Exportación de PyTorch (.pt) a formato universal ONNX</h3>
+                    <p>El modelo de entrenamiento original se guarda en formato <span class="highlight-text">best.pt</span> (PyTorch). Dado que Android no puede ejecutar pesos directos de PyTorch de manera eficiente, primero se convierte a <strong>ONNX (Open Neural Network Exchange)</strong>, un estándar de representación abierta para modelos de machine learning.</p>
+                    <p><strong>Comando de Exportación (Python):</strong></p>
+                    <div class="code-block">
+                        <span class="code-badge">Python</span>
+                        <pre>from ultralytics import YOLO
+
+# Cargar el modelo entrenado
+model = YOLO('best.pt')
+
+# Exportar a formato ONNX configurando la resolución a 480x480
+model.export(format='onnx', imgsz=480, dynamic=False)</pre>
+                    </div>
+                    <p><em>¿Por qué?</em> Definimos <span class="highlight-text">imgsz=480</span> porque es la resolución optimizada del entrenamiento, y desactivamos la opción de dimensiones dinámicas (<span class="highlight-text">dynamic=False</span>) para garantizar que la estructura del modelo TFLite final sea fija y rápida.</p>
+                </div>
+
+                <!-- PASO 2 -->
+                <div class="step-item">
+                    <div class="step-number">Paso 2</div>
+                    <h3 class="step-title">Compilación a TensorFlow Lite (.tflite)</h3>
+                    <p>ONNX representa el modelo como un grafo abierto, pero los procesadores móviles necesitan un formato binario ligero. Usamos la herramienta especializada <span class="highlight-text">onnx2tf</span> para transformar el archivo ONNX a TensorFlow Lite, realizando optimización y plegamiento de constantes.</p>
+                    <p><strong>Comando de Compilación (Terminal):</strong></p>
+                    <div class="code-block">
+                        <span class="code-badge">Bash / Windows PowerShell</span>
+                        <pre>onnx2tf -i best.onnx -o app/src/main/assets -n</pre>
+                    </div>
+                    <p><em>¿Por qué?</em> El parámetro <span class="highlight-text">-i</span> indica la ruta del archivo ONNX de origen, <span class="highlight-text">-o</span> define dónde guardar los archivos binarios directamente en la carpeta de recursos de la aplicación Android, y el indicador <span class="highlight-text">-n</span> deshabilita los tests automáticos acelerando la compilación.</p>
+                </div>
+
+                <!-- PASO 3 -->
+                <div class="step-item">
+                    <div class="step-number">Paso 3</div>
+                    <h3 class="step-title">Extracción de Clases y Etiquetas</h3>
+                    <p>Un modelo de clasificación predice números de clase (ej. clase 0, clase 1). Para que el usuario final lea el nombre común o científico de la madera, debemos extraer el listado exacto en el orden correspondiente. Se extrajo la metadata del archivo original de entrenamiento para crear <span class="highlight-text">labels.txt</span>.</p>
+                    <p><strong>Comando de Extracción (Python):</strong></p>
+                    <div class="code-block">
+                        <span class="code-badge">Python</span>
+                        <pre>from ultralytics import YOLO
+
+model = YOLO('best.pt')
+# Imprimir y mapear el listado de nombres ordenados
+for idx, name in sorted(model.names.items()):
+    print(name)</pre>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- DETALLE TÉCNICO RESUELTO -->
+            <div class="note-box">
+                <div class="note-icon">💡</div>
+                <div>
+                    <div class="note-box-title">Reto Técnico Resuelto durante el Proceso: Incompatibilidad de NumPy 2.x</div>
+                    <p>Durante la compilación en Windows, la herramienta <span class="highlight-text">onnx2tf</span> fallaba con un error de deserialización de pickle (`ValueError: This file contains pickled (object) data`). Esto se debía a que NumPy 2.x (usado en Python 3.13) bloquea por seguridad la carga de objetos serializados sin permisos explícitos.</p>
+                    <p><strong>Solución:</strong> Se modificó la librería de compilación nativa en el sistema en `common_functions.py` para forzar <span class="highlight-text">np.load(f, allow_pickle=True)</span> al cargar las imágenes de calibración. Con este ajuste se logró compilar el modelo de manera limpia.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- SECCIÓN 2: ARQUITECTURA DE LA APP -->
+    <div id="arquitectura" class="tab-content">
+        <div class="card">
+            <h2>Arquitectura del Software Android</h2>
+            <p>La aplicación móvil está construida sobre arquitectura nativa Java en Android Studio. Sigue un modelo de capas donde la lógica de la interfaz de usuario se mantiene separada de los cálculos del modelo matemático.</p>
+
+            <!-- DIAGRAMA DE ARQUITECTURA -->
+            <h3>Diagrama de Estructura y Flujo de Datos</h3>
+            <div class="diagram-container">
+                <svg class="diagram-svg" viewBox="0 0 700 400" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Fondo -->
+                    <rect width="700" height="400" rx="15" fill="#FAF6F0" />
+                    
+                    <!-- Capa UI -->
+                    <rect x="30" y="50" width="180" height="300" rx="10" fill="#FFFFFF" stroke="#8B5A2B" stroke-width="2" />
+                    <text x="120" y="80" text-anchor="middle" fill="#3E2723" font-weight="bold" font-size="14">CAPA UI (MainActivity)</text>
+                    
+                    <rect x="50" y="110" width="140" height="40" rx="6" fill="#F5ECE1" />
+                    <text x="120" y="135" text-anchor="middle" fill="#8B5A2B" font-size="12" font-weight="bold">📸 Cámara / 📁 Galería</text>
+                    
+                    <rect x="50" y="180" width="140" height="40" rx="6" fill="#F5ECE1" />
+                    <text x="120" y="205" text-anchor="middle" fill="#8B5A2B" font-size="12" font-weight="bold">🖼️ Bitmap Preview</text>
+                    
+                    <rect x="50" y="250" width="140" height="40" rx="6" fill="#F5ECE1" />
+                    <text x="120" y="275" text-anchor="middle" fill="#8B5A2B" font-size="11" font-weight="bold">📊 Resultados (confianza)</text>
+                    
+                    <!-- Capa Lógica -->
+                    <rect x="260" y="50" width="200" height="300" rx="10" fill="#FFFFFF" stroke="#008080" stroke-width="2" />
+                    <text x="360" y="80" text-anchor="middle" fill="#2D221C" font-weight="bold" font-size="14">PROCESADOR (WoodClassifier)</text>
+                    
+                    <rect x="280" y="110" width="160" height="40" rx="6" fill="#E0F2F1" />
+                    <text x="360" y="135" text-anchor="middle" fill="#008080" font-size="12" font-weight="bold">🔍 ResizeOp (480x480)</text>
+                    
+                    <rect x="280" y="180" width="160" height="40" rx="6" fill="#E0F2F1" />
+                    <text x="360" y="205" text-anchor="middle" fill="#008080" font-size="12" font-weight="bold">⚖️ NormalizeOp (0-1)</text>
+                    
+                    <rect x="280" y="250" width="160" height="40" rx="6" fill="#E0F2F1" />
+                    <text x="360" y="275" text-anchor="middle" fill="#008080" font-size="12" font-weight="bold">🧠 TFLite Interpreter</text>
+
+                    <!-- Capa Assets -->
+                    <rect x="510" y="90" width="160" height="220" rx="10" fill="#EEDECF" stroke="#8D6E63" stroke-width="2" stroke-dasharray="5,5" />
+                    <text x="590" y="120" text-anchor="middle" fill="#3E2723" font-weight="bold" font-size="14">ASSETS (Memoria)</text>
+                    
+                    <rect x="525" y="150" width="130" height="45" rx="6" fill="#FFFFFF" />
+                    <text x="590" y="177" text-anchor="middle" fill="#2D221C" font-size="11">best_float32.tflite</text>
+                    
+                    <rect x="525" y="220" width="130" height="45" rx="6" fill="#FFFFFF" />
+                    <text x="590" y="247" text-anchor="middle" fill="#2D221C" font-size="12">labels.txt (35 clases)</text>
+                    
+                    <!-- Líneas Conectoras (Flujo) -->
+                    <path d="M 190 200 L 260 200" stroke="#008080" stroke-width="3" fill="none" marker-end="url(#arrow)" />
+                    <path d="M 440 130 L 525 170" stroke="#8D6E63" stroke-dasharray="3,3" stroke-width="2" fill="none" />
+                    <path d="M 440 270 L 525 240" stroke="#8D6E63" stroke-dasharray="3,3" stroke-width="2" fill="none" />
+                    <path d="M 260 280 L 190 280" stroke="#008080" stroke-width="3" fill="none" />
+
+                    <!-- Marcador de flecha -->
+                    <defs>
+                        <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                            <path d="M 0 0 L 10 5 L 0 10 z" fill="#008080" />
+                        </marker>
+                    </defs>
+                </svg>
+            </div>
+
+            <div class="grid-2">
+                <div>
+                    <h3>1. Capa de Presentación (UI)</h3>
+                    <p>Configurada en <span class="highlight-text">MainActivity.java</span> y <span class="highlight-text">activity_main.xml</span>.</p>
+                    <ul>
+                        <li>Recibe la interacción del usuario mediante botones cómodos y de gran área de pulsación (64dp de altura).</li>
+                        <li>Utiliza los disparadores modernos de Android Jetpack (<span class="tech-badge">ActivityResultLauncher</span>) para abrir la cámara nativa del celular o seleccionar fotos del almacenamiento, capturando la imagen directamente en memoria RAM como un objeto <strong>Bitmap</strong>.</li>
+                        <li>Actualiza el porcentaje de confianza en una barra de progreso de tono verde orgánico en tiempo real.</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>2. Capa de Lógica y Procesamiento</h3>
+                    <p>Encapsulada en la clase auxiliar <span class="highlight-text">WoodClassifier.java</span>.</p>
+                    <ul>
+                        <li>Carga el archivo binario del modelo TFLite directamente desde la memoria de los activos de la aplicación (Assets) usando canales de lectura rápidos de archivo de Java (<span class="tech-badge">FileChannel.MapMode.READ_ONLY</span>).</li>
+                        <li>Inicializa el motor de inferencia de TensorFlow Lite configurado en **4 hilos de procesamiento (Threads)** de CPU móvil para optimizar la velocidad en procesadores multinúcleo de teléfonos inteligentes.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>Estructura del Código en Gradle (build.gradle.kts)</h3>
+            <p>Para soportar esta arquitectura, añadimos las librerías oficiales de bajo nivel de TensorFlow y la de soporte para imágenes en la configuración de dependencias de Gradle:</p>
+            
+            <div class="code-block">
+                <span class="code-badge">build.gradle.kts</span>
+                <pre>// Dependencias añadidas en el módulo :app
+dependencies {
+    // Motor básico de inferencia
+    implementation("org.tensorflow:tensorflow-lite:2.16.1")
+    // Librería de soporte para procesamiento de imágenes y buffers de tensores
+    implementation("org.tensorflow:tensorflow-lite-support:0.4.4")
+}
+
+android {
+    // Evita que el compilador de Android reduzca o comprima el archivo .tflite al empaquetar el APK
+    aaptOptions {
+        noCompress("tflite")
+    }
+}</pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN 3: INFERENCIA DEL MODELO -->
+    <div id="modelo" class="tab-content">
+        <div class="card">
+            <h2>Carga del Modelo y Flujo de Inferencia</h2>
+            <p>El núcleo de la aplicación radica en cómo el modelo procesa matemáticamente la imagen. Aquí detallamos los pasos exactos del ciclo de vida de una inferencia desde que entra la foto hasta que se muestra el resultado en pantalla:</p>
+
+            <div class="steps-timeline">
+                
+                <!-- PASO 1 -->
+                <div class="step-item">
+                    <div class="step-number">Fase 1</div>
+                    <h3 class="step-title">Preparación del Contenedor de Entrada (TensorImage)</h3>
+                    <p>La foto capturada en formato <strong>Bitmap</strong> de Android no se puede introducir directamente en el intérprete de C++. Debe cargarse en un contenedor de bajo nivel estructurado como una matriz tridimensional en punto flotante (`FLOAT32`).</p>
+                    <div class="code-block">
+                        <span class="code-badge">Java</span>
+                        <pre>TensorImage tensorImage = new TensorImage(DataType.FLOAT32);
+tensorImage.load(bitmap);</pre>
+                    </div>
+                </div>
+
+                <!-- PASO 2 -->
+                <div class="step-item">
+                    <div class="step-number">Fase 2</div>
+                    <h3 class="step-title">Pipeline de Preprocesamiento de Imagen</h3>
+                    <p>Para asegurar que la imagen de entrada tenga exactamente las mismas características con las que se entrenó la red neuronal YOLO, aplicamos un flujo de trabajo encadenado:</p>
+                    <div class="code-block">
+                        <span class="code-badge">Java</span>
+                        <pre>ImageProcessor imageProcessor = new ImageProcessor.Builder()
+        // 1. Redimensionar a la resolución esperada por el modelo (480x480)
+        .add(new ResizeOp(480, 480, ResizeOp.ResizeMethod.BILINEAR))
+        // 2. Escalar valores de color enteros [0, 255] a floats [0.0, 1.0] (255 - 0 / 255)
+        .add(new NormalizeOp(0.0f, 255.0f))
+        .build();
+
+TensorImage processedImage = imageProcessor.process(tensorImage);</pre>
+                    </div>
+                    <p><em>¿Por qué?</em> Si omitiéramos la redimensión, el intérprete lanzaría una excepción por disparidad de tamaño. Si no normalizáramos a base `[0.0, 1.0]`, la red recibiría valores saturados (fuera de escala) y las predicciones serían erróneas.</p>
+                </div>
+
+                <!-- PASO 3 -->
+                <div class="step-item">
+                    <div class="step-number">Fase 3</div>
+                    <h3 class="step-title">Inferencia en el Intérprete y Búfer de Salida</h3>
+                    <p>La salida del modelo YOLO de clasificación es un tensor plano de tamaño `[1, 35]`, que representa el porcentaje de probabilidad de las 35 especies de madera. Preparamos un buffer de memoria de tamaño fijo (`FLOAT32`) para recibir esta salida directamente desde la inferencia de C++:</p>
+                    <div class="code-block">
+                        <span class="code-badge">Java</span>
+                        <pre>// Crear buffer de salida para recibir 35 probabilidades
+TensorBuffer outputBuffer = TensorBuffer.createFixedSize(new int[]{1, 35}, DataType.FLOAT32);
+
+// Ejecutar la inferencia en CPU móvil
+interpreter.run(processedImage.getBuffer(), outputBuffer.getBuffer().rewind());</pre>
+                    </div>
+                </div>
+
+                <!-- PASO 4 -->
+                <div class="step-item">
+                    <div class="step-number">Fase 4</div>
+                    <h3 class="step-title">Post-procesamiento: Extracción del Resultado Más Probable</h3>
+                    <p>Una vez ejecutada la inferencia, el buffer de salida se llena con 35 números decimales correspondientes a la confianza del modelo para cada madera. El programa recorre este listado para encontrar la posición (índice) que contenga la probabilidad más alta (valor máximo) y busca su nombre en el listado de etiquetas.</p>
+                    <div class="code-block">
+                        <span class="code-badge">Java</span>
+                        <pre>float[] outputArray = outputBuffer.getFloatArray();
+int maxIdx = -1;
+float maxVal = -1.0f;
+
+// Buscar el valor máximo en la predicción
+for (int i = 0; i < outputArray.length; i++) {
+    if (outputArray[i] > maxVal) {
+        maxVal = outputArray[i];
+        maxIdx = i;
+    }
+}
+
+// Obtener nombre de la madera correspondiente
+String nombreEspecie = labels.get(maxIdx);</pre>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- PIE DE PÁGINA -->
+    <footer>
+        <p>Dashboard de Exposición del Proyecto • Desarrollado por Equipo Trinity • 2026</p>
+    </footer>
+
+</div>
+
+<!-- CÓDIGO JAVASCRIPT PARA EL CAMBIO DE PESTAÑAS -->
+<script>
+    function switchTab(event, tabId) {
+        // Ocultar todos los contenidos de pestaña
+        const contents = document.querySelectorAll('.tab-content');
+        contents.forEach(content => content.classList.remove('active'));
+
+        // Desactivar todos los botones
+        const buttons = document.querySelectorAll('.tab-btn');
+        buttons.forEach(btn => btn.classList.remove('active'));
+
+        // Mostrar contenido actual y activar botón
+        document.getElementById(tabId).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+</script>
+
+</body>
+</html>
