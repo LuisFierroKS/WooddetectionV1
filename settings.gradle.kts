@@ -22,6 +22,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Wood detection V1"
+rootProject.name = "Wood Identifier 2.0"
 include(":app")
  

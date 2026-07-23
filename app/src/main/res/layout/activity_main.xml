@@ -16,7 +16,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:text="Clasificador de Madera 🪵"
+        android:text="Wood Identifier 2.0 🪵"
         android:textColor="#3E2723"
         android:textSize="26sp"
         android:textStyle="bold"
