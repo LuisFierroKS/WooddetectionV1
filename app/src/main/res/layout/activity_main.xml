@@ -186,9 +186,9 @@
         android:id="@+id/buttonsLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="32dp"
+        android:layout_marginBottom="16dp"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/btnWoodTypes"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
@@ -221,5 +221,22 @@
             app:cornerRadius="16dp" />
 
     </LinearLayout>
+
+    <!-- Botón para ver Tipos de Maderas -->
+    <Button
+        android:id="@+id/btnWoodTypes"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_marginBottom="32dp"
+        android:backgroundTint="#8B5A2B"
+        android:text="🪵 Tipos de Maderas"
+        android:textAllCaps="false"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:cornerRadius="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
