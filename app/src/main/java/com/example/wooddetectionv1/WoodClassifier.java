@@ -10,6 +10,7 @@ import org.tensorflow.lite.support.image.ImageProcessor;
 import org.tensorflow.lite.support.image.TensorImage;
 import org.tensorflow.lite.support.image.ops.ResizeOp;
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WoodClassifier {
+    private static final float CONFIDENCE_THRESHOLD = 0.70f;
 
     private Interpreter interpreter;
     private final List<String> labels = new ArrayList<>();
@@ -95,9 +97,30 @@ public class WoodClassifier {
                 maxIdx = i;
             }
         }
+        Log.d(
+    "WOOD_CLASSIFIER",
+    "Etiqueta: " + labels.get(maxIdx) +
+    " | Confianza: " + maxVal
+);
 
-        String className = (maxIdx != -1 && maxIdx < labels.size()) ? labels.get(maxIdx) : "Desconocido (" + maxIdx + ")";
-        return new ClassificationResult(className, maxVal, maxIdx);
+        String className;
+
+// Si la confianza es menor al umbral establecido,
+// se considera que la imagen no pertenece a ninguna
+// especie registrada por el modelo.
+    if (maxIdx != -1 && maxIdx < labels.size()) {
+
+        if (maxVal >= CONFIDENCE_THRESHOLD) {
+            className = labels.get(maxIdx);
+        } else {
+        className = "Especie no reconocida";
+        }
+
+    } else {
+    className = "Desconocido";
+}
+
+return new ClassificationResult(className, maxVal, maxIdx);
     }
 
     public void close() {
