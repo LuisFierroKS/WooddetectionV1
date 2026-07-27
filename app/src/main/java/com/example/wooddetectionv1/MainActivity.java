@@ -15,7 +15,9 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import java.io.InputStream;
+import com.example.wooddetectionv1.woodtypes.WoodTypesActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -29,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     private ProgressBar confidenceProgress;
     private Button btnCamera;
     private Button btnGallery;
+    private Button btnWoodTypes;
 
     // Lanzador para capturar foto de la cámara (retorna una miniatura en Bitmap)
     private final ActivityResultLauncher<Void> takePicturePreviewLauncher = registerForActivityResult(
@@ -84,6 +87,12 @@ public class MainActivity extends AppCompatActivity {
         btnCamera.setOnClickListener(v -> takePicturePreviewLauncher.launch(null));
 
         btnGallery.setOnClickListener(v -> selectImageLauncher.launch("image/*"));
+
+        btnWoodTypes = findViewById(R.id.btnWoodTypes);
+        btnWoodTypes.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, WoodTypesActivity.class);
+            startActivity(intent);
+        });
     }
 
     private void analizarYMostrarImagen(Bitmap bitmap) {
